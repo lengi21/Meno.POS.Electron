@@ -27,10 +27,17 @@ jobs:
         run: |
           $version = '${{ github.ref_name }}' -replace '^release/', ''
           gh release view "v$version" --repo '${{ github.repository }}' 2>$null
-          if ($LASTEXITCODE -ne 0) { gh release create "v$version" --repo '${{ github.repository }}' --target '${{ github.sha }}' --title "Meno POS Desktop $version" --notes "Windows x64 desktop release." }
+          if ($LASTEXITCODE -ne 0) { gh release create "v$version" --repo '${{ github.repository }}' --target '${{ github.sha }}' --title "Meno POS Desktop $version" --notes "Windows x64 desktop release." --draft }
       - run: pnpm install --frozen-lockfile
       - name: Build and publish installer
         env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}' }
         run: pnpm release
+      - name: Publish the updater release
+        shell: pwsh
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}' }
+        run: |
+          $version = '${{ github.ref_name }}' -replace '^release/', ''
+          gh release edit "v$version" --repo '${{ github.repository }}' --draft=false
+
 
 
