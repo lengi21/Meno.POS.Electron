@@ -1,0 +1,27 @@
+name: Build Meno POS Desktop release
+on:
+  push:
+    tags: ['release/*.*.*']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0 }
+      - uses: pnpm/action-setup@v4
+        with: { version: 11 }
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: pnpm }
+      - name: Validate release tag
+        shell: pwsh
+        run: |
+          if ('${{ github.ref_name }}' -notmatch '^release/\d+\.\d+\.\d+$') { throw 'Use a release/x.y.z tag.' }
+          $branch = "release/$($matches[0] -replace '^release/(\d+\.\d+)\.\d+$','$1')"
+          git fetch origin $branch
+          if ((git merge-base HEAD "origin/$branch") -ne (git rev-parse HEAD)) { throw "The tag must be created from $branch." }
+      - run: pnpm install --frozen-lockfile
+      - name: Build and publish installer
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}' }
+        run: pnpm release

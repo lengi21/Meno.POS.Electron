@@ -1,0 +1,2 @@
+import { contextBridge, ipcRenderer } from 'electron';
+contextBridge.exposeInMainWorld('electronAPI', { isDesktop: true, printers: () => ipcRenderer.invoke('desktop:printers'), bindings: () => ipcRenderer.invoke('desktop:bindings:get'), saveBinding: (kind: string, value: { deviceName: string; paperWidthMm: number }) => ipcRenderer.invoke('desktop:bindings:save', kind, value), printReceipt: (receipt: unknown) => ipcRenderer.invoke('desktop:print', receipt) });

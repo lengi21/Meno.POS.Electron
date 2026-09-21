@@ -1,0 +1,12 @@
+{
+  "name": "meno-pos-desktop",
+  "version": "1.0.0",
+  "description": "Meno POS Desktop for Windows thermal printing",
+  "main": "dist/main.js",
+  "private": true,
+  "packageManager": "pnpm@11.23.0",
+  "scripts": { "dev": "concurrently -k \"pnpm:watch\" \"pnpm:run-desktop\"", "watch": "tsc --watch", "run-desktop": "wait-on dist/main.js && electron . --start-url=http://localhost:4200", "build": "tsc", "dist": "pnpm build && electron-builder --win nsis", "release": "pnpm build && electron-builder --win nsis --publish always" },
+  "build": { "appId": "ge.meno.pos.desktop", "productName": "Meno POS Desktop", "asar": true, "files": ["dist/**/*", "package.json"], "directories": { "output": "release" }, "win": { "target": [{ "target": "nsis", "arch": ["x64"] }], "artifactName": "Meno-POS-Desktop-Setup-${version}.${ext}" }, "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "perMachine": false, "createDesktopShortcut": true, "createStartMenuShortcut": true }, "publish": [{ "provider": "github", "owner": "lengi21", "repo": "Meno.POS.Electron" }] },
+  "devDependencies": { "@types/node": "^24.0.0", "concurrently": "^9.2.1", "electron": "^37.0.0", "electron-builder": "^26.0.12", "typescript": "~5.9.2", "wait-on": "^8.0.3" },
+  "dependencies": { "electron-updater": "^6.6.2" }
+}
