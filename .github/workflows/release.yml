@@ -21,8 +21,16 @@ jobs:
           $branch = "release/$($matches[0] -replace '^release/(\d+\.\d+)\.\d+$','$1')"
           git fetch origin $branch
           if ((git merge-base HEAD "origin/$branch") -ne (git rev-parse HEAD)) { throw "The tag must be created from $branch." }
+      - name: Create the updater release
+        shell: pwsh
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}' }
+        run: |
+          $version = '${{ github.ref_name }}' -replace '^release/', ''
+          gh release view "v$version" --repo '${{ github.repository }}' 2>$null
+          if ($LASTEXITCODE -ne 0) { gh release create "v$version" --repo '${{ github.repository }}' --target '${{ github.sha }}' --title "Meno POS Desktop $version" --notes "Windows x64 desktop release." }
       - run: pnpm install --frozen-lockfile
       - name: Build and publish installer
         env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}' }
         run: pnpm release
+
 
