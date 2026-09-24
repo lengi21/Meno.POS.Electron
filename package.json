@@ -1,6 +1,6 @@
 {
   "name": "meno-pos-desktop",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Meno POS Desktop for Windows thermal printing",
   "main": "dist/main.js",
   "private": true,
@@ -62,3 +62,4 @@
     "electron-updater": "^6.6.2"
   }
 }
+
