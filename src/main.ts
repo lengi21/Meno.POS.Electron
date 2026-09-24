@@ -1,7 +1,7 @@
 import {app, BrowserWindow, ipcMain, Menu, session, shell} from 'electron';
 import path from 'node:path';
 import {autoUpdater} from 'electron-updater';
-import {readFileSync, writeFileSync, renameSync, mkdirSync} from 'node:fs';
+import {readFileSync, writeFileSync, mkdirSync} from 'node:fs';
 
 type ReceiptKind = 'ORDER' | 'MODIFICATION' | 'ADVANCE_CHEQUE' | 'CLOSE_CHEQUE' | 'DAY_BALANCE';
 type Receipt = {
@@ -63,11 +63,10 @@ function bindings(): Bindings {
     }
 }
 
+// Windows can briefly retain the previous file handle. Writing the tiny JSON file
+// in place avoids a failed temporary-file rename that would lose a selected printer.
 function saveBindings(value: Bindings): void {
-    const file = bindingFile();
-    const temporary = `${file}.tmp`;
-    writeFileSync(temporary, JSON.stringify(value, null, 2), 'utf8');
-    renameSync(temporary, file);
+    writeFileSync(bindingFile(), JSON.stringify(value, null, 2), 'utf8');
 }
 
 function senderAllowed(event: Electron.IpcMainInvokeEvent): boolean {
